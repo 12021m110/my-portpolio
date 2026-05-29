@@ -480,29 +480,42 @@
     50% { transform: translateY(-10px); }
   }
   
-  .floating-card.card-1 {
-    top: 10%;
-    right: -10%;
-    animation-delay: 0s;
-  }
-  
-  .floating-card.card-2 {
-    bottom: 20%;
-    left: -15%;
-    animation-delay: 2s;
-  }
+  .floating-card {
+  position: absolute;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: float 6s ease-in-out infinite;
+  box-shadow: var(--shadow-card);
+  width: 250px;
+  z-index: 20;
+}
 
-  .floating-card.card-3 {
-    top: 15%;
-    left: -10%;
-    animation-delay: 4s;
-  }
-  
-  .floating-card.card-4 {
-    bottom: 5%;
-    right: 0;
-    animation-delay: 6s;
-  }
+/* AWS Expert */
+.floating-card.card-1 {
+  top: 2%;
+  right: -80px;
+  animation-delay: 0s;
+}
+
+/* Kubernetes */
+.floating-card.card-2 {
+  top: 55%;
+  left: -140px;
+  animation-delay: 2s;
+}
+
+/* Terraform */
+.floating-card.card-3 {
+  bottom: 2%;
+  right: -70px;
+  animation-delay: 4s;
+}
   
   .floating-card-icon {
     width: 40px;
