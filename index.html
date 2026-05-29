@@ -316,11 +316,13 @@ nav.scrolled { padding: 0.9rem 3rem; background: rgba(5,5,8,0.9); }
   flex-shrink: 0;
   position: relative;
   z-index: 1;
+  isolation: isolate;
 }
 .avatar-ring {
   position: relative;
   width: 320px;
   height: 320px;
+  isolation: isolate;
 }
 .avatar-ring-outer {
   position: absolute; inset: 0;
@@ -371,9 +373,9 @@ nav.scrolled { padding: 0.9rem 3rem; background: rgba(5,5,8,0.9); }
   z-index: 2;
 }
 
-.float-badge:nth-child(1) { top: 5%; left: -40px; animation: floatA 4s ease-in-out infinite; }
-.float-badge:nth-child(2) { bottom: 15%; right: -30px; animation: floatB 5s ease-in-out infinite; }
-.float-badge:nth-child(3) { bottom: -10px; left: 0; animation: floatA 3.5s 1s ease-in-out infinite; }
+.float-badge:nth-child(1) { top: 5%; left: 10px; animation: floatA 4s ease-in-out infinite; }
+.float-badge:nth-child(2) { bottom: 15%; right: 10px; animation: floatB 5s ease-in-out infinite; }
+.float-badge:nth-child(3) { bottom: 10px; left: 10px; animation: floatA 3.5s 1s ease-in-out infinite; }
 
 @keyframes floatA { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 @keyframes floatB { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
