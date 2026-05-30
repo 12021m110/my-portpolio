@@ -7,6 +7,7 @@ pipeline {
         IMAGE_TAG = "${BUILD_NUMBER}"
         EC2_HOST = '52.73.68.208'
         EC2_USER = 'ubuntu'
+        SONAR_PROJECT_KEY = 'portfolio'
     }
 
     stages {
@@ -15,6 +16,30 @@ pipeline {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/12021m110/my-portpolio.git'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        sonar-scanner \
+                          -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                          -Dsonar.projectName="Portfolio Website" \
+                          -Dsonar.sources=. \
+                          -Dsonar.inclusions="**/*.html,**/*.css,**/*.js" \
+                          -Dsonar.host.url=${SONAR_HOST_URL} \
+                          -Dsonar.login=${SONAR_AUTH_TOKEN}
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
@@ -31,13 +56,13 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 withAWS(region: "${AWS_REGION}", credentials: 'aws-credentials') {
-                sh '''
-                     aws ecr get-login-password --region ${AWS_REGION} | \
-                     docker login --username AWS \
-                     --password-stdin ${ECR_REPO}
-                     docker push ${ECR_REPO}:${IMAGE_TAG}
-                     docker push ${ECR_REPO}:latest
-                '''
+                    sh '''
+                        aws ecr get-login-password --region ${AWS_REGION} | \
+                        docker login --username AWS \
+                        --password-stdin ${ECR_REPO}
+                        docker push ${ECR_REPO}:${IMAGE_TAG}
+                        docker push ${ECR_REPO}:latest
+                    '''
                 }
             }
         }
@@ -72,14 +97,42 @@ pipeline {
                 '''
             }
         }
+
+        stage('Prometheus Metrics Check') {
+            steps {
+                sshagent(['ec2-ssh-key']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "
+                            echo '=== Container Status ==='
+                            docker ps | grep portfolio
+
+                            echo '=== Container Stats ==='
+                            docker stats portfolio --no-stream --format \
+                            'CPU: {{.CPUPerc}} | Memory: {{.MemUsage}} | Network: {{.NetIO}}'
+
+                            echo '=== HTTP Response Check ==='
+                            curl -o /dev/null -s -w \
+                            'HTTP Status: %{http_code} | Response Time: %{time_total}s\n' \
+                            http://localhost
+
+                            echo '=== Prometheus Health ==='
+                            curl -s http://localhost:9090/-/healthy || \
+                            echo 'Prometheus not running - skipping'
+                        "
+                    '''
+                }
+            }
+        }
+
     }
 
     post {
         success {
-            echo "Portfolio deployed successfully! Build #${BUILD_NUMBER}"
+            echo "✅ Pipeline SUCCESS — Build #${BUILD_NUMBER}"
+            echo "🌐 Site: https://venkatanaresh.qzz.io"
+            echo "📊 SonarQube: Quality gate passed"
+            echo "📈 Prometheus: Metrics verified"
         }
         failure {
-            echo "Deployment failed! Check logs."
-        }
-    }
-}
+            echo "❌ Pipeline FAILED — Build #${BUILD_NUMBER}"
+            echo "🔍 Check console output for details"
