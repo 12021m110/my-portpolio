@@ -112,7 +112,7 @@ pipeline {
 
                             echo '=== HTTP Response Check ==='
                             curl -o /dev/null -s -w \
-                            'HTTP Status: %{http_code} | Response Time: %{time_total}s\n' \
+                            'HTTP Status: %{http_code} | Response Time: %{time_total}s' \
                             http://localhost
 
                             echo '=== Prometheus Health ==='
@@ -128,10 +128,17 @@ pipeline {
 
     post {
         success {
-            echo "✅ Pipeline SUCCESS — Build #${BUILD_NUMBER}"
-            echo "🌐 Site: https://venkatanaresh.qzz.io"
-            echo "📊 SonarQube: Quality gate passed"
-            echo "📈 Prometheus: Metrics verified"
+            echo "Pipeline SUCCESS - Build #${BUILD_NUMBER}"
+            echo "Site: https://venkatanaresh.qzz.io"
+            echo "SonarQube: Quality gate passed"
+            echo "Prometheus: Metrics verified"
         }
-        failure {
-            echo "❌ Pipeline FAILED — Build
+        ailure {
+            echo "Pipeline FAILED - Build #${BUILD_NUMBER}"
+            echo "Check SonarQube quality gate or deployment logs"
+        }
+        always {
+            sh 'docker image prune -f || true'
+        }
+    }
+}
