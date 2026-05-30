@@ -1,0 +1,42 @@
+---
+- name: Deploy Portfolio
+  hosts: portfolio
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Install AWS CLI
+      apt:
+        name: awscli
+        state: present
+
+    - name: Pull latest image
+      shell: |
+        aws ecr get-login-password --region us-east-1 | \
+        docker login --username AWS --password-stdin {{ ecr_repo }}
+        docker pull {{ ecr_repo }}:latest
+
+    - name: Stop existing container
+      shell: docker stop portfolio || true
+
+    - name: Remove old container
+      shell: docker rm portfolio || true
+
+    - name: Run new container
+      shell: |
+        docker run -d \
+          --name portfolio \
+          -p 80:80 \
+          --restart always \
+          {{ ecr_repo }}:latest
