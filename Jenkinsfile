@@ -5,7 +5,7 @@ pipeline {
         AWS_REGION = 'us-east-1'
         ECR_REPO = '266735824916.dkr.ecr.us-east-1.amazonaws.com/portfolio'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        EC2_HOST = '54.90.64.143'
+        EC2_HOST = '52.73.68.208'
         EC2_USER = 'ubuntu'
     }
 
