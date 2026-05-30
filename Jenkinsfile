@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-        ECR_REPO = 'your-account-id.dkr.ecr.us-east-1.amazonaws.com/portfolio'
+        ECR_REPO = '266735824916.dkr.ecr.us-east-1.amazonaws.com/portfolio'
         IMAGE_TAG = "${BUILD_NUMBER}"
         EC2_HOST = '54.90.64.143'
         EC2_USER = 'ubuntu'
@@ -30,7 +30,7 @@ pipeline {
 
         stage('Push to ECR') {
             steps {
-                withAWS(region: "${AWS_REGION}", credentials: 'aws-credentials') {
+                withAWS(region: "${AWS_REGION}", credentials: 'aws-creds') {
                     sh '''
                         aws ecr get-login-password --region ${AWS_REGION} | \
                         docker login --username AWS --password-stdin ${ECR_REPO}
