@@ -133,7 +133,7 @@ pipeline {
             echo "SonarQube: Quality gate passed"
             echo "Prometheus: Metrics verified"
         }
-        ailure {
+        failure {
             echo "Pipeline FAILED - Build #${BUILD_NUMBER}"
             echo "Check SonarQube quality gate or deployment logs"
         }
