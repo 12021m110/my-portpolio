@@ -134,5 +134,4 @@ pipeline {
             echo "📈 Prometheus: Metrics verified"
         }
         failure {
-            echo "❌ Pipeline FAILED — Build #${BUILD_NUMBER}"
-            echo "🔍 Check console output for details"
+            echo "❌ Pipeline FAILED — Build
