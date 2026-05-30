@@ -30,16 +30,15 @@ pipeline {
 
         stage('Push to ECR') {
             steps {
-                withAWS(region: "${AWS_REGION}", credentials: 'aws-creds') {
-                    sh '''
-                        aws ecr get-login-password --region ${AWS_REGION} | \
-                        docker login --username AWS --password-stdin ${ECR_REPO}
-                        docker push ${ECR_REPO}:${IMAGE_TAG}
-                        docker push ${ECR_REPO}:latest
-                    '''
-                }
-            }
-        }
+               sh '''
+                    aws ecr get-login-password --region us-east-1 > /tmp/ecr_token.txt
+                    docker login --username AWS --password-stdin 266735824916.dkr.ecr.us-east-1.amazonaws.com < /tmp/ecr_token.txt
+                    rm -f /tmp/ecr_token.txt
+                    docker push ${ECR_REPO}:${IMAGE_TAG}
+                    docker push ${ECR_REPO}:latest
+                '''
+           }
+       }
 
         stage('Deploy to EC2') {
             steps {
